@@ -75,7 +75,8 @@ class RandomRotate(object):
 
 def crease_rot_dataset(use_cuda= True, batch_size = 1):
     kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
-    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+    #data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+    data_path = '~/.torch/data'
 
     test_loader = torch.utils.data.DataLoader(
     datasets.MNIST(data_path, train=False, transform=transforms.Compose([
