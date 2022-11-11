@@ -32,11 +32,14 @@ if __name__ == '__main__':
         torch.cuda.manual_seed(args.seed)
 
     model = Net()
+    model.load_state_dict(torch.load('model_baseline.pt'))
+    directory = 'baseline'
     if args.use_arf:
         upgrade_to_orn(model, num_orientation=8, scale_factor=8, classifier=model.fc1,
             features=model.fc1, invariant_encoding='align', encode_after_features=False)
+        model.load_state_dict(torch.load('model_orn.pt'))
+        directory = 'orn'
     print(model)
-    model.load_state_dict(torch.load('model_baseline.pt'))
     if args.cuda:
         model.cuda()
 
@@ -49,12 +52,12 @@ if __name__ == '__main__':
                 data, target = data.cuda().squeeze(0), target.cuda()
             output = model(data).softmax(dim = 1)
             y = output[:, target.item()].cpu().numpy()
-            plt.plot(np.linspace(0, 1, y.shape[0]), y, lw = 2)
+            plt.plot(np.linspace(0, 1, y.shape[0]), y, c = color[target.item()], lw = 2)
             plt.xticks([0, 0.25, 0.5, 0.75], [r'$0$', r'$\pi$/4', r'$\pi$/2', r'$3\pi$/4'])
             legend_elements = [Patch(facecolor = color[target.item()], label = "The Neuron for Digit " + str(target.item()))]
             plt.legend(handles = legend_elements, loc = 'lower right')
             plt.ylim(0, 1.1)
-            plt.savefig("pdf/" + str(idx) + ".png", dpi=120, box_inches="tight")
+            plt.savefig(directory + "/" + str(idx) + ".png", dpi=120, box_inches="tight")
             idx += 1
             plt.cla()
 
